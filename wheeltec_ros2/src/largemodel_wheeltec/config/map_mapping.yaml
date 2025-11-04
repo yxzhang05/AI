@@ -1,0 +1,51 @@
+# 地图映射配置文件 / Map Mapping Configuration File
+# 用于定义导航目标点位置 / Used to define navigation target point positions
+# 
+# 示例格式 / Example format:
+# point_name:
+#   position:
+#     x: 1.0
+#     y: 2.0
+#     z: 0.0
+#   orientation:
+#     x: 0.0
+#     y: 0.0
+#     z: 0.0
+#     w: 1.0
+
+# 示例目标点 / Example target points
+# 请根据实际环境修改或添加更多目标点
+# Please modify or add more target points according to the actual environment
+
+home:
+  position:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+
+point1:
+  position:
+    x: 1.0
+    y: 1.0
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+
+point2:
+  position:
+    x: 2.0
+    y: 0.0
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.707
+    w: 0.707

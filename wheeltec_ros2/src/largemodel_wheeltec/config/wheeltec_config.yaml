@@ -1,0 +1,62 @@
+# WHEELTEC Robot Configuration for Voice/Text Control
+# WHEELTEC 机器人语音/文本控制配置文件
+
+# === 基础控制配置 / Basic Control Configuration ===
+action_service:
+  ros__parameters:
+    # 速度控制话题
+    Speed_topic: "/cmd_vel"
+    
+    # 文本聊天模式（true: 仅文本，false: 语音+文本）
+    text_chat_mode: false
+    
+    # 语言设置（zh: 中文, en: 英文）
+    language: "zh"
+
+# === 大模型服务配置 / Large Model Service Configuration ===
+model_service:
+  ros__parameters:
+    # 语言设置
+    language: "zh"
+    
+    # 区域设置（China: 中国, international: 国际）
+    regional_setting: "China"
+    
+    # 文本聊天模式
+    text_chat_mode: false
+
+# === 语音识别配置 / ASR Configuration ===
+asr:
+  ros__parameters:
+    # VAD（语音活动检测）模式 (0-3, 数值越大检测越严格)
+    VAD_MODE: 1
+    
+    # 音频采样率
+    sample_rate: 48000
+    
+    # 音频帧时长（毫秒）
+    frame_duration_ms: 30
+    
+    # 语言设置
+    language: "zh"
+    
+    # 是否使用在线ASR（true: 在线, false: 本地）
+    use_oline_asr: false
+    
+    # 麦克风串口（根据实际设备修改）
+    mic_serial_port: "/dev/ttyUSB1"
+    
+    # 麦克风索引
+    mic_index: 0
+    
+    # 区域设置
+    regional_setting: "China"
+
+# === 可选配置 / Optional Configuration ===
+# 如果需要视觉功能，取消注释以下配置
+# If visual features are needed, uncomment the following configuration
+
+# camera:
+#   ros__parameters:
+#     # 图像话题
+#     image_topic: "/camera/color/image_raw"
