@@ -351,6 +351,100 @@ echo "如果没有移动，请检查底盘驱动和硬件连接"
 
 ---
 
+## 特定错误解决方案
+
+### 错误：'model_interface' object has no attribute 'model_type'
+
+#### 错误描述
+
+在 action_service 终端看到以下错误：
+
+```
+[ERROR] [1763626942.154588661] [action_service_ndoe]: Error raised in execute callback: 'model_interface' object has no attribute 'model_type'
+Traceback (most recent call last):
+  ...
+  File "/home/wheeltec/wheeltec_ros2/install/largemodel/lib/python3.10/site-packages/utils/large_model_interface.py", line 703, in voice_synthesis
+    if self.model_type == "oline":
+AttributeError: 'model_interface' object has no attribute 'model_type'
+```
+
+同时 model_service 显示：
+
+```
+[INFO] [1763626942.145199859] [LargeModelService]: "action": ['set_cmdvel(0.5, 0, 0, 2)'], "response": 好的，我这就前进1米。
+```
+
+#### 问题分析
+
+✅ **text_chat 正常** - 用户输入已发送到 /asr  
+✅ **model_service 正常** - 大模型已解析指令并规划动作  
+✅ **函数调用正常** - 已生成 `set_cmdvel(0.5, 0, 0, 2)` 调用  
+❌ **action_service 执行失败** - 在执行过程中尝试调用语音合成功能时出错
+
+#### 根本原因
+
+`action_service` 在执行动作后尝试调用 `voice_synthesis()` 函数（语音合成），但是 `model_interface` 对象缺少 `model_type` 属性的初始化。
+
+这是 **action_service 代码的问题**，不是文本输入功能的问题。
+
+#### 解决方案
+
+**方案 1：修复 model_interface 初始化（推荐）**
+
+编辑 `utils/large_model_interface.py`，在 `__init__` 方法中确保初始化 `model_type`：
+
+```python
+def __init__(self, ...):
+    # ... 其他初始化代码 ...
+    self.model_type = "offline"  # 或根据配置设置为 "oline" 或其他值
+```
+
+**方案 2：禁用语音合成功能（快速修复）**
+
+如果您不需要语音反馈，可以临时注释掉 action_service 中的语音合成调用。
+
+编辑 `action_service.py`，找到第 578 行附近：
+
+```python
+# 注释掉这行
+# self.model_client.voice_synthesis(...)
+```
+
+**方案 3：检查配置文件**
+
+确认 `wheeltec_config.yaml` 中有正确的模型类型配置：
+
+```yaml
+model_service:
+  ros__parameters:
+    # ... 其他配置 ...
+    # 确保有模型类型配置
+```
+
+#### 验证修复
+
+修复后重新启动 action_service：
+
+```bash
+ros2 run largemodel action_service --ros-args --params-file src/largemodel/config/wheeltec_config.yaml
+```
+
+然后输入指令测试，应该看到：
+- action_service 不再报错
+- /cmd_vel 话题有速度消息
+- 小车开始移动
+
+#### 补充说明
+
+这个错误表明：
+1. ✅ **文本输入功能工作正常** - text_chat 成功发送了指令
+2. ✅ **大模型集成正常** - model_service 成功解析并规划了动作
+3. ❌ **action_service 有 bug** - 在语音合成部分缺少必要的属性初始化
+
+**这不是文本输入移植的问题**，而是 WHEELTEC 原始 action_service 代码在某些情况下的已存在问题。文本输入功能本身已经正确完成了它的工作（发送用户输入到 /asr 话题）。
+
+---
+
 **祝调试顺利！** 🚀
 
 如有其他问题，请提供上述调试信息以便进一步分析。
